@@ -1,0 +1,4 @@
+# 大肥鱼开屏：宿主半边是空的，渲染在客户端。(The host half is a no-op; the client owns the splash.)
+- insert:
+    - id: dafeiyu-splash
+      name: dsh-dafeiyu-splash

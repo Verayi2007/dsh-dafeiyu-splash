@@ -1,0 +1,8 @@
+# 构建中间产物（预览页与 client.js 是产物，但需要提交——插件直接跑产物）
+build/
+.asar-dump/
+*.log
+
+# 系统垃圾
+.DS_Store
+Thumbs.db

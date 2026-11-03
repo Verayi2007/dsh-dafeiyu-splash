@@ -1,0 +1,50 @@
+{
+  "name": "dsh-dafeiyu-splash",
+  "version": "1.0.0",
+  "description": "大肥鱼开屏动效：DeepSeek Harness 启动时的一段全屏片头——鲸鱼描边自绘、形体凝出、高光斜扫、字标落款，可点击跳过。A skippable full-screen opening animation for DeepSeek Harness, built around the DeepSeek whale.",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true
+    }
+  },
+  "keywords": [
+    "deepseek",
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "client-plugin",
+    "splash",
+    "opening-animation",
+    "whale"
+  ],
+  "license": "MIT",
+  "author": "Verayi2007",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Verayi2007/dsh-dafeiyu-splash.git"
+  },
+  "homepage": "https://github.com/Verayi2007/dsh-dafeiyu-splash#readme",
+  "bugs": {
+    "url": "https://github.com/Verayi2007/dsh-dafeiyu-splash/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
