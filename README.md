@@ -1,34 +1,42 @@
 # 大肥鱼开屏 · dsh-dafeiyu-splash
 
-给 **DeepSeek Harness** 做的一段全屏开屏动效：点开之后，**大肥鱼娘**从水下浮上来 —— 先是雾里的人影，然后落定、泛光、一道高光从她身上掠过，最后 `DeepSeek` 字标落款。约 3.7 秒，随时可以跳过。
+给 **DeepSeek Harness** 做的一段开屏动画：**大肥鱼娘先从屏幕底边探出个头，看清是你，一下冲到面前占满整屏，再萌萌地退回舞台、缩回原大小，冲你挥手说「嗨～」。**
 
 纯客户端插件：不注册服务、不加工具、不联网、不读会话。
 
 <p align="center">
-  <img src="docs/preview.png" width="820" alt="开屏定格：鲸鱼娘 + DeepSeek 字标">
+  <img src="docs/preview.png" width="820" alt="冲到面前：她占满整屏的那一拍">
 </p>
 
-<p align="center"><sub>上图为 <code>preview/preview.html</code> 在浏览器里定格到第 3.4 秒的截图，不是插件在 DSH 里的实拍。</sub></p>
+<p align="center"><sub>她冲到面前的那一拍（<code>preview/preview.html?t=2000</code>）。</sub></p>
 
-## 时间轴
+<p align="center">
+  <img src="docs/preview-end.png" width="620" alt="落定：挥手、打招呼、字标">
+</p>
+
+<p align="center"><sub>落定的样子（<code>?t=4300</code>）：挥手 + 「嗨～」+ 字标。</sub></p>
+
+## 五拍
 
 | 时间 | 发生什么 |
 | --- | --- |
-| 0 – 0.9s | 幕布亮起，一道斜光从水面透下来，四角压暗 |
-| 0.2 – 1.7s | 她身后的冷光亮起，一圈细环像水里的回响一样扩散 |
-| 0.3 – 1.9s | **上浮**：从模糊的景深里升起来（14px 模糊 → 0），脚下的水面光同时铺开 |
-| 1.35 – 4.0s | 气泡错峰上浮 |
-| 1.5 – 2.9s | **高光斜扫**：一道白光沿她身体掠过 —— 用她的 alpha 当遮罩，光只落在人身上，不会糊到背景 |
-| 1.9 – 3.25s | **落款**：`DeepSeek` 字距从 0.64em 收到 0.42em 上浮，细线展开，`深度求索` 淡入 |
-| 2.52s 起 | 三个信号点开始脉动，表示还在加载 |
-| 3.1s | 收幕：整幕淡出（0.56s），3.66s 卸载，指针事件全部归还 |
+| 0 – 0.5s | 幕布亮起，斜光落下，四角压暗 |
+| 0.5 – 1.2s | **探头**：她从屏幕底边升上来，只露一颗头，光晕跟着她的头一起沉到底部 |
+| 1.2 – 1.6s | 停一下、微微歪头，然后**往下一缩**（蓄力） |
+| 1.6 – 2.4s | **冲满屏**：一下顶到面前，脸占满整幅画面，白光闪一下（这一拍是整段的重点） |
+| 2.4 – 2.9s | **退回来**：缩回原大小、落回舞台，带一点过冲和回弹 |
+| 2.9 – 4.3s | **打招呼**：左右晃两下（挥手），旁边弹出「嗨～」气泡；2.9s 字标落款、3.05s 一道高光扫过 |
+| 3.8s 起 | 三个信号点脉动，表示还在加载 |
+| 4.6s | 收幕淡出（0.56s），5.16s 卸载，指针事件全部归还 |
+
+整段镜头是一条 5000ms 的关键帧（`.dfy-camera`）驱动的：探头、蓄力、满屏、退回都在这一条上；光晕、气泡、字标、信号点挂在同一根时间轴上按拍子错开。
 
 ## 交互
 
 - **随时跳过**：点击 / 触摸任意位置，或按任意键、滚一下滚轮，立刻收幕。
 - **自动收场**：即使脚本出错，CSS 也会把这一幕走完，不会挡着界面。
 - **一次页面加载只放一次**：SPA 内的路由切换、会话切换都不会重放。
-- **跟随系统「减弱动态效果」**：`prefers-reduced-motion: reduce` 时只留一次极简淡入，扫光和气泡全部不出现。
+- **跟随系统「减弱动态效果」**：`prefers-reduced-motion: reduce` 时不做镜头运动，只留一张定格的她 + 字标。
 
 ## 安装
 
@@ -41,7 +49,7 @@ git clone https://github.com/Verayi2007/dsh-dafeiyu-splash
 dsh plugin --profile desktop add "link:/绝对/路径/dsh-dafeiyu-splash"
 ```
 
-装完 **刷新一次界面**（客户端 bundle 在页面加载时注入）；桌面版建议直接重启一次 DSH。
+装完**重启一次 DSH**（客户端 bundle 在启动时装配）。
 
 卸载：
 
@@ -49,37 +57,39 @@ dsh plugin --profile desktop add "link:/绝对/路径/dsh-dafeiyu-splash"
 dsh plugin --profile desktop remove dsh-dafeiyu-splash
 ```
 
-## 改一改
+> Tarball 装法不会自动把包写进 profile 的 `dsh.profile.bundles`。装完没反应的话，看一眼
+> `~/.dsh/profiles/desktop/package.json` 的 `bundles` 里有没有 `dsh-dafeiyu-splash`，没有就手动补一行。
 
-在页面控制台里（或你自己的注入脚本里）覆盖任意一项，下一次加载生效：
+## 改一改
 
 ```js
 window.__DAFEIYU_SPLASH__ = {
   disabled: true,        // 这一次不放
-  duration: 3100,        // 开始收幕的时间（毫秒）
+  duration: 4600,        // 开始收幕的时间（毫秒）
   title: "DeepSeek",     // 主字标
   subtitle: "深度求索",  // 副标，给空串则隐藏
   hint: "点击任意位置继续"
 };
 ```
 
+气泡那句「嗨～」在 `src/splash.body.html` 的 `.dfy-talk` 里，改字就行。
+
 诊断：阶段写在 `<html data-dafeiyu-splash>` 上 —— `playing` / `leaving` / `done`；浮层节点是 `[data-plugin="dsh-dafeiyu-splash"]`。
 
-## 换角色 / 改画面
+## 换角色 / 改节奏
 
-- **换角色**：把 `assets/feiyu.webp` 换成你自己的透明底立绘（方形、长边 700–800px 最好），重新 `python tools/build.py`。
-- **改节奏**：`src/splash.css` 顶部的注释写了每一拍的毫秒数，改 `animation-delay` 就是改时间轴。
-- **一份源码，两个落点**：`src/` 由 `tools/build.py` 编译成
-  - `preview/preview.html` —— 免安装预览页，浏览器直接打开，`?t=1800` 定格到第 1800 毫秒；
+- **换角色**：把 `assets/feiyu.webp` 换成你自己的透明底立绘（方形，长边 1000–1200px 最好 —— 要放大到 3 倍占满屏），重新 `python tools/build.py`。
+- **改节奏**：所有拍子都在 `src/splash.css` 的 `@keyframes dfy-camera` 里（百分比 × 5000ms 就是毫秒），改那组数字就是改镜头。
+- **一份源码，两个落点**：
+  - `preview/preview.html` —— 免安装预览页，浏览器直接打开；`?t=2000` 定格到第 2000 毫秒（同步定格，截图不会抓空）；
   - `client.js` —— 插件用的自包含客户端模块（图以 base64 内嵌，单文件、零外部请求）。
 
 ```
-src/splash.css       视觉与时间轴（全部动画都在这里）
+src/splash.css       视觉与时间轴（镜头、挥手、气泡、字标全在这）
 src/splash.body.html 结构：立绘 + 光晕 + 高光 + 气泡 + 字标
-src/runtime.js       挂载 / 跳过 / 收幕
+src/runtime.js       挂载 / 跳过 / 收幕 / 定格
 assets/feiyu.webp    角色立绘（CC BY-NC-SA 4.0，见 assets/README.md）
 tools/build.py       生成预览页与 client.js
-tools/prep_art.py    立绘裁边、缩放、转 WebP
 ```
 
 ## 许可

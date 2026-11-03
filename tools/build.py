@@ -46,22 +46,13 @@ var DFY_BODY = {js(body)};
 
 {runtime}
 
-window.__DAFEIYU_SPLASH__ = Object.assign({{ duration: 3100 }}, window.__DAFEIYU_SPLASH__ || {{}});
-var dfyCtl = dfyCreateSplash(document.getElementById("dfy-stage"), {{}});
+window.__DAFEIYU_SPLASH__ = Object.assign({{ duration: 4600 }}, window.__DAFEIYU_SPLASH__ || {{}});
 
-/* ?t=1800 定格到第 1800 毫秒，方便截图与逐帧看 */
+/* ?t=1800 定格到第 1800 毫秒：交给 runtime 在挂载时同步做完，截图不会再抓空 */
 var freezeAt = Number(new URLSearchParams(location.search).get("t"));
-if (freezeAt > 0) {{
-  requestAnimationFrame(function () {{
-    setTimeout(function () {{
-      document.getAnimations().forEach(function (a) {{
-        try {{ a.pause(); a.currentTime = freezeAt; }} catch (e) {{}}
-      }});
-      var root = document.querySelector(".dfy-splash");
-      if (root) {{ root.style.transition = "none"; root.style.opacity = "1"; }}
-    }}, 60);
-  }});
-}}
+if (freezeAt > 0) window.__DFY_FREEZE__ = freezeAt;
+
+var dfyCtl = dfyCreateSplash(document.getElementById("dfy-stage"), {{}});
 </script>
 </body>
 </html>

@@ -1,18 +1,19 @@
 ﻿/* ==========================================================================
-   大肥鱼开屏 · 视觉与时间轴
+   大肥鱼开屏 · 视觉与时间轴（动画版）
    所有类名都以 .dfy- 开头，挂在一棵 .dfy-splash 子树里，不进宿主全局。
-   时间轴（毫秒，从挂载算起）：
-     0     幕布亮起、光轴落下
-    200    光晕亮起、细环扩散
-    300    她从水里升起来（1.6s，带景深）
-    700    倒影跟上
-    1500   一道高光从她身上扫过（1.4s）
-    1350   气泡上浮（错峰）
-    1900   字标上浮
-    2180   细线展开
-    2320   副标淡入
-    2520   信号点开始脉动
-    3100   收幕（0.56s），3660 卸载
+
+   一整段镜头（5000ms 的 camera 关键帧，其余元素挂在同一根时间轴上）：
+     0ms      幕布、光轴、光晕起
+    500ms    她从屏幕底边探出半个头
+    800ms    停住、微微歪一下（探头看）
+   1200ms    往下一缩，蓄力
+   1700ms    冲上来占满整屏，白光闪一下
+   2300ms    满屏停一拍
+   2800ms    萌萌地退回舞台、缩回原大小（带一点过冲）
+   2880ms    开始挥手（左右晃两下）+ 说话气泡「嗨～」
+   3050ms    字标落款
+   3800ms    信号点脉动
+   4600ms    收幕，5160ms 卸载
    ========================================================================== */
 
 .dfy-splash {
@@ -95,47 +96,71 @@
     radial-gradient(1.7px 1.7px at 86% 62%, rgba(180, 202, 255, 0.32), transparent 60%),
     radial-gradient(1.1px 1.1px at 25% 72%, rgba(205, 222, 255, 0.3), transparent 60%),
     radial-gradient(1.4px 1.4px at 60% 88%, rgba(205, 222, 255, 0.2), transparent 60%),
-    radial-gradient(1px 1px at 44% 10%, rgba(205, 222, 255, 0.28), transparent 60%),
-    radial-gradient(1.2px 1.2px at 8% 50%, rgba(205, 222, 255, 0.2), transparent 60%);
+    radial-gradient(1px 1px at 44% 10%, rgba(205, 222, 255, 0.28), transparent 60%);
   opacity: 0;
   animation: dfy-stars-in 1600ms ease-out 220ms both;
 }
 
-/* ---------- 主体 ---------- */
+/* 满屏那一下的白光 */
+.dfy-flash {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 45%, rgba(226, 238, 255, 0.95), rgba(150, 184, 255, 0.5) 45%, transparent 72%);
+  opacity: 0;
+  animation: dfy-flash 700ms cubic-bezier(0.3, 0, 0.2, 1) 1650ms both;
+}
+
+/* ---------- 舞台 ---------- */
 
 .dfy-stage {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  transform: translateY(-0.5vh);
+  transform: translateY(-1.2vh);
 }
 
 .dfy-figure {
   position: relative;
-  height: min(49vh, 480px);
+  height: min(46vh, 430px);
   aspect-ratio: 1 / 1;
-  animation: dfy-float 7.5s ease-in-out 2300ms infinite;
+}
+
+/* 镜头：整段运动都在这一个关键帧里 —— 探头、蓄力、满屏、退回 */
+.dfy-camera {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  transform-origin: 50% 34%;
+  animation: dfy-camera 5000ms cubic-bezier(0.4, 0, 0.2, 1) 0ms both;
+  will-change: transform;
+}
+
+/* 挥手：单独一层，免得跟镜头的位移打架 */
+.dfy-sway {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 86%;
+  animation: dfy-sway 1500ms ease-in-out 2880ms both;
 }
 
 .dfy-portrait {
-  position: relative;
-  z-index: 3;
   display: block;
   width: 100%;
   height: 100%;
   object-fit: contain;
+  filter: drop-shadow(0 22px 44px rgba(14, 28, 90, 0.66)) drop-shadow(0 0 22px rgba(104, 144, 255, 0.26));
   opacity: 0;
-  transform: translateY(38px) scale(1.05);
-  filter: blur(14px) drop-shadow(0 26px 48px rgba(14, 28, 90, 0.66)) drop-shadow(0 0 24px rgba(104, 144, 255, 0.28));
-  animation: dfy-rise 1600ms cubic-bezier(0.16, 0.84, 0.22, 1) 300ms both;
+  animation: dfy-portrait-in 700ms ease-out 420ms both;
 }
 
-/* 她身后的一团冷光，把人和背景分开 */
+/* 她身后的一团冷光 */
 .dfy-halo {
   position: absolute;
   left: 50%;
-  top: 42%;
+  top: 44%;
   width: 96%;
   aspect-ratio: 1;
   transform: translate(-50%, -50%) scale(0.82);
@@ -143,8 +168,8 @@
   background: radial-gradient(circle, rgba(112, 152, 255, 0.42), rgba(58, 92, 220, 0.14) 46%, transparent 68%);
   filter: blur(26px);
   opacity: 0;
-  animation: dfy-halo-in 1500ms ease-out 200ms both;
   z-index: 1;
+  animation: dfy-halo-in 1500ms ease-out 200ms both, dfy-halo-track 5000ms cubic-bezier(0.4, 0, 0.2, 1) 0ms both;
 }
 
 /* 一圈慢慢扩散的细环，像水里的一声回响 */
@@ -158,12 +183,12 @@
   border-radius: 50%;
   border: 1px solid rgba(124, 162, 255, 0.28);
   opacity: 0;
-  animation: dfy-orbit 3400ms cubic-bezier(0.22, 0.61, 0.36, 1) 240ms both;
-  pointer-events: none;
   z-index: 0;
+  animation: dfy-orbit 2600ms cubic-bezier(0.22, 0.61, 0.36, 1) 1500ms both;
+  pointer-events: none;
 }
 
-/* 一道光从她身上扫过：用她的 alpha 当遮罩，光只会落在人身上 */
+/* 一道光从她身上扫过：用她的 alpha 当遮罩，光只落在人身上 */
 .dfy-sheen {
   position: absolute;
   inset: 0;
@@ -186,13 +211,13 @@
   bottom: -30%;
   left: -40%;
   width: 46%;
-  background: linear-gradient(100deg, transparent 10%, rgba(255, 255, 255, 0.42) 48%, rgba(214, 232, 255, 0.62) 54%, transparent 92%);
+  background: linear-gradient(100deg, transparent 10%, rgba(255, 255, 255, 0.4) 48%, rgba(214, 232, 255, 0.6) 54%, transparent 92%);
   transform: rotate(9deg);
   opacity: 0;
-  animation: dfy-sheen 1300ms cubic-bezier(0.4, 0, 0.3, 1) 1750ms both;
+  animation: dfy-sheen 1300ms cubic-bezier(0.4, 0, 0.3, 1) 3050ms both;
 }
 
-/* 她脚下一小片水面光，压住构图 */
+/* 她脚下一小片水面光 */
 .dfy-ground {
   position: absolute;
   left: 50%;
@@ -205,7 +230,41 @@
   filter: blur(18px);
   opacity: 0;
   z-index: 2;
-  animation: dfy-ground-in 1400ms ease-out 700ms both, dfy-breathe 5.4s ease-in-out 2200ms infinite;
+  animation: dfy-ground-in 1200ms ease-out 600ms both, dfy-breathe 5.4s ease-in-out 2400ms infinite;
+}
+
+/* ---------- 打招呼 ---------- */
+
+.dfy-talk {
+  position: absolute;
+  left: 73%;
+  top: 7%;
+  z-index: 6;
+  padding: 9px 15px 10px;
+  border-radius: 16px 16px 16px 5px;
+  background: rgba(233, 240, 255, 0.97);
+  color: #1a2350;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: 0 10px 26px rgba(4, 10, 32, 0.45);
+  transform-origin: 0% 100%;
+  opacity: 0;
+  animation: dfy-talk 2600ms cubic-bezier(0.34, 1.56, 0.64, 1) 2900ms both;
+}
+
+.dfy-talk::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  bottom: -6px;
+  width: 12px;
+  height: 12px;
+  background: rgba(233, 240, 255, 0.97);
+  transform: rotate(45deg);
+  border-radius: 0 0 3px 0;
 }
 
 /* 气泡 */
@@ -249,14 +308,14 @@
   text-shadow: 0 0 30px rgba(122, 162, 255, 0.4);
   opacity: 0;
   transform: translateY(12px);
-  animation: dfy-word-in 1050ms cubic-bezier(0.16, 0.84, 0.28, 1) 1900ms both;
+  animation: dfy-word-in 1050ms cubic-bezier(0.16, 0.84, 0.28, 1) 3050ms both;
 }
 
 .dfy-rule {
   width: 0;
   height: 1px;
   background: linear-gradient(90deg, transparent, rgba(160, 190, 255, 0.7), transparent);
-  animation: dfy-rule 950ms cubic-bezier(0.22, 0.61, 0.36, 1) 2180ms both;
+  animation: dfy-rule 950ms cubic-bezier(0.22, 0.61, 0.36, 1) 3300ms both;
 }
 
 .dfy-sub {
@@ -265,7 +324,7 @@
   padding-left: 0.66em;
   color: #7f90bb;
   opacity: 0;
-  animation: dfy-fade-up 950ms ease-out 2320ms both;
+  animation: dfy-fade-up 950ms ease-out 3450ms both;
 }
 
 /* 信号点：三个，脉动 = 还在加载 */
@@ -277,7 +336,7 @@
   display: flex;
   gap: 10px;
   opacity: 0;
-  animation: dfy-fade-in 700ms ease-out 2520ms both;
+  animation: dfy-fade-in 700ms ease-out 3800ms both;
 }
 
 .dfy-dots i {
@@ -302,7 +361,7 @@
   letter-spacing: 0.26em;
   color: #93a4cc;
   opacity: 0;
-  animation: dfy-hint-in 900ms ease-out 2400ms both;
+  animation: dfy-hint-in 900ms ease-out 3600ms both;
 }
 
 /* ---------- 关键帧 ---------- */
@@ -310,17 +369,62 @@
 @keyframes dfy-bg-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes dfy-shaft-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes dfy-stars-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes dfy-rise {
-  0% { opacity: 0; transform: translateY(38px) scale(1.05); filter: blur(14px) drop-shadow(0 26px 48px rgba(14, 28, 90, 0.66)); }
-  20% { opacity: 0.6; }
-  40% { opacity: 1; }
-  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0) drop-shadow(0 26px 48px rgba(14, 28, 90, 0.66)) drop-shadow(0 0 24px rgba(104, 144, 255, 0.28)); }
+@keyframes dfy-portrait-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* 0 藏在屏幕外；8–20% 只探出一颗头；26% 缩回去蓄力；32–48% 冲满屏；56% 过冲落回；72% 稳住 */
+@keyframes dfy-camera {
+  0%   { transform: translateY(190%) scale(0.94); }
+  8%   { transform: translateY(132%) scale(1); }
+  14%  { transform: translateY(128%) scale(1); }
+  20%  { transform: translateY(130%) scale(1.005) rotate(-1.4deg); }
+  26%  { transform: translateY(143%) scale(0.99); }
+  32%  { transform: translateY(-4%) scale(3.05); }
+  38%  { transform: translateY(-2%) scale(3.16); }
+  48%  { transform: translateY(-2%) scale(3.2); }
+  56%  { transform: translateY(0%) scale(1.06); }
+  64%  { transform: translateY(0%) scale(0.985); }
+  72%  { transform: translateY(0%) scale(1); }
+  100% { transform: translateY(0%) scale(1); }
 }
-@keyframes dfy-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-7px); }
+
+@keyframes dfy-sway {
+  0%   { transform: rotate(0deg); }
+  18%  { transform: rotate(-4.5deg); }
+  38%  { transform: rotate(3.6deg); }
+  58%  { transform: rotate(-3deg); }
+  78%  { transform: rotate(1.8deg); }
+  100% { transform: rotate(0deg); }
 }
-@keyframes dfy-halo-in { from { opacity: 0; transform: translate(-50%, -50%) scale(0.82); } to { opacity: 0.95; transform: translate(-50%, -50%) scale(1); } }
+
+@keyframes dfy-flash {
+  0% { opacity: 0; }
+  18% { opacity: 0.9; }
+  60% { opacity: 0.25; }
+  100% { opacity: 0; }
+}
+
+@keyframes dfy-talk {
+  0% { opacity: 0; transform: scale(0.6) translateY(6px); }
+  12% { opacity: 1; transform: scale(1.06) translateY(0); }
+  20% { opacity: 1; transform: scale(1); }
+  76% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.94) translateY(-4px); }
+}
+
+@keyframes dfy-halo-in { from { opacity: 0; } to { opacity: 0.95; } }
+
+/* 光晕跟着她的头走：探头时一起沉到画面底部，冲满屏时回到中间 */
+@keyframes dfy-halo-track {
+  0%   { transform: translate(-50%, -50%) translateY(178%) scale(0.9); }
+  8%   { transform: translate(-50%, -50%) translateY(120%) scale(1); }
+  14%  { transform: translate(-50%, -50%) translateY(116%) scale(1); }
+  20%  { transform: translate(-50%, -50%) translateY(118%) scale(1); }
+  26%  { transform: translate(-50%, -50%) translateY(130%) scale(0.96); }
+  34%  { transform: translate(-50%, -50%) translateY(0%) scale(1.06); }
+  48%  { transform: translate(-50%, -50%) translateY(0%) scale(1.08); }
+  60%  { transform: translate(-50%, -50%) translateY(0%) scale(1); }
+  100% { transform: translate(-50%, -50%) translateY(0%) scale(1); }
+}
 @keyframes dfy-orbit {
   0% { opacity: 0; transform: translate(-50%, -50%) scale(0.7); }
   22% { opacity: 0.5; }
@@ -353,13 +457,14 @@
   100% { opacity: 0; transform: translate(var(--dfy-drift, 12px), -210px) scale(1.2); }
 }
 
-/* 尊重系统「减弱动态效果」：只留一次极简淡入 */
+/* 尊重系统「减弱动态效果」：只留一张定格的她 + 字标 */
 @media (prefers-reduced-motion: reduce) {
-  .dfy-bg, .dfy-shaft, .dfy-stars, .dfy-figure, .dfy-portrait, .dfy-halo, .dfy-orbit, .dfy-sheen,
-  .dfy-ground, .dfy-title, .dfy-rule, .dfy-sub, .dfy-dots, .dfy-hint, .dfy-bubble {
+  .dfy-bg, .dfy-shaft, .dfy-stars, .dfy-portrait, .dfy-halo, .dfy-orbit, .dfy-sheen,
+  .dfy-ground, .dfy-title, .dfy-rule, .dfy-sub, .dfy-dots, .dfy-hint, .dfy-bubble, .dfy-flash {
     animation-duration: 1ms !important;
     animation-delay: 0ms !important;
   }
-  .dfy-sheen, .dfy-bubble, .dfy-orbit { display: none; }
-  .dfy-figure { animation: none; }
+  .dfy-camera, .dfy-sway, .dfy-talk, .dfy-sheen, .dfy-bubble, .dfy-orbit { animation: none !important; }
+  .dfy-camera { transform: translateY(0) scale(1) !important; }
+  .dfy-talk { display: none; }
 }

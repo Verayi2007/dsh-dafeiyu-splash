@@ -10,7 +10,7 @@ function dfyCreateSplash(host, options) {
   var doc = host.ownerDocument || document;
   var win = doc.defaultView || window;
 
-  var duration = typeof opts.duration === "number" ? opts.duration : 3100;
+  var duration = typeof opts.duration === "number" ? opts.duration : 4600;
   var fadeMs = 560;
 
   var root = doc.createElement("div");
@@ -97,6 +97,26 @@ function dfyCreateSplash(host, options) {
   });
 
   host.appendChild(root);
+
+  /* 预览页专用：window.__DFY_FREEZE__ = 毫秒 时，把整段动画定格到那一帧，
+     同步做完（在首帧绘制之前），这样截图一定是想要的那一帧。 */
+  if (typeof win.__DFY_FREEZE__ === "number" && win.__DFY_FREEZE__ > 0) {
+    try {
+      void root.offsetWidth;
+      var anims = doc.getAnimations ? doc.getAnimations() : [];
+      for (var i = 0; i < anims.length; i++) {
+        try {
+          anims[i].currentTime = win.__DFY_FREEZE__;
+          anims[i].pause();
+        } catch (e) {
+          /* ignore */
+        }
+      }
+      root.style.transition = "none";
+    } catch (e) {
+      /* ignore */
+    }
+  }
 
   timerOut = win.setTimeout(leave, duration);
   return { destroy: destroy, skip: skip, root: root };
