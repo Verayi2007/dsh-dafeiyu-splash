@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    大肥鱼开屏 · 视觉与时间轴（动画版）
    所有类名都以 .dfy- 开头，挂在一棵 .dfy-splash 子树里，不进宿主全局。
 
@@ -146,14 +146,32 @@
   animation: dfy-sway 1500ms ease-in-out 2880ms both;
 }
 
-.dfy-portrait {
+/* 身体：呼吸；头单独一层，可以相对身体轻轻动 —— 两层叠起来才像活的 */
+.dfy-rig {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 96%;
+  filter: drop-shadow(0 22px 44px rgba(14, 28, 90, 0.66)) drop-shadow(0 0 22px rgba(104, 144, 255, 0.26));
+  opacity: 0;
+  animation:
+    dfy-portrait-in 700ms ease-out 420ms both,
+    dfy-breathe-body 6.2s ease-in-out 1100ms infinite;
+}
+
+.dfy-rig img {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 22px 44px rgba(14, 28, 90, 0.66)) drop-shadow(0 0 22px rgba(104, 144, 255, 0.26));
-  opacity: 0;
-  animation: dfy-portrait-in 700ms ease-out 420ms both;
+}
+
+.dfy-head {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 72%;
+  animation: dfy-head-idle 8.4s ease-in-out 900ms infinite;
 }
 
 /* 她身后的一团冷光 */
@@ -457,14 +475,31 @@
   100% { opacity: 0; transform: translate(var(--dfy-drift, 12px), -210px) scale(1.2); }
 }
 
+
+@keyframes dfy-breathe-body {
+  0%, 100% { transform: scale(1, 1); }
+  50% { transform: scale(1.01, 1.017); }
+}
+
+@keyframes dfy-head-idle {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  11%  { transform: translate(-2.2px, -1.4px) rotate(-0.9deg); }
+  25%  { transform: translate(2px, 0.6px) rotate(0.7deg); }
+  39%  { transform: translate(0, -1.4px) rotate(0deg); }
+  54%  { transform: translate(-2.8px, -0.8px) rotate(-1.4deg); }
+  70%  { transform: translate(1.2px, 0) rotate(0.45deg); }
+  86%  { transform: translate(0, 0) rotate(0deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
 /* 尊重系统「减弱动态效果」：只留一张定格的她 + 字标 */
 @media (prefers-reduced-motion: reduce) {
-  .dfy-bg, .dfy-shaft, .dfy-stars, .dfy-portrait, .dfy-halo, .dfy-orbit, .dfy-sheen,
+  .dfy-bg, .dfy-shaft, .dfy-stars, .dfy-rig, .dfy-halo, .dfy-orbit, .dfy-sheen,
   .dfy-ground, .dfy-title, .dfy-rule, .dfy-sub, .dfy-dots, .dfy-hint, .dfy-bubble, .dfy-flash {
     animation-duration: 1ms !important;
     animation-delay: 0ms !important;
   }
-  .dfy-camera, .dfy-sway, .dfy-talk, .dfy-sheen, .dfy-bubble, .dfy-orbit { animation: none !important; }
+  .dfy-camera, .dfy-sway, .dfy-talk, .dfy-sheen, .dfy-head, .dfy-bubble, .dfy-orbit { animation: none !important; }
   .dfy-camera { transform: translateY(0) scale(1) !important; }
   .dfy-talk { display: none; }
 }

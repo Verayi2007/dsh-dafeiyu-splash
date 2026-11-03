@@ -13,14 +13,28 @@ PKG = ROOT
 
 import base64
 ART_FILE = ROOT / "assets" / "feiyu.webp"
-art = "data:image/webp;base64," + base64.b64encode(ART_FILE.read_bytes()).decode("ascii")
+BODY_FILE = ROOT / "assets" / "rig" / "body.webp"
+HEAD_FILE = ROOT / "assets" / "rig" / "head.webp"
+
+
+def data_uri(path):
+    return "data:image/webp;base64," + base64.b64encode(path.read_bytes()).decode("ascii")
+
+
+art = data_uri(ART_FILE)
+body_img = data_uri(BODY_FILE)
+head_img = data_uri(HEAD_FILE)
 
 css = (SRC / "splash.css").read_text(encoding="utf-8-sig")
 body = (SRC / "splash.body.html").read_text(encoding="utf-8-sig")
 runtime = (SRC / "runtime.js").read_text(encoding="utf-8-sig")
 
 css = css.replace("{{ART}}", art)
-body = body.replace("{{ART}}", art)
+body = (
+    body.replace("{{ART}}", art)
+    .replace("{{BODY}}", body_img)
+    .replace("{{HEAD}}", head_img)
+)
 
 
 def js(value):
